@@ -2,7 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
-docs/
+docs/*.docx
+docs/*.odt
+docs/*.ods
+docs/*.html
 data/
 data-raw/
 PlantWaterPools.Rproj

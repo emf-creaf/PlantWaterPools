@@ -1,0 +1,55 @@
+---
+title: "Appendices"
+author: "Miquel De Cáceres"
+date: "2025-07-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Appendix
+
+### Fraction of ground area corresponding to water pools
+
+Considering water pools involves partitioning the ground area into fractions corresponding to the abundance of each plant cohort. More specifically, the model defines as many water pools as plant cohorts. The fraction of ground area corresponding to a given water pool $i$ is defined by the leaf area index (LAI) and the root area to leaf area ratio (RLR) of its corresponding plant cohort:
+
+$f_i = \frac{LAI_i \cdot RLR_i}{\sum_{j}{LAI_j \cdot RLR_j}}$
+
+Assuming that all plant cohorts have the same RLR ratio, the former equation reduces to the proportion of total LAI accounted by the plant cohort:
+
+$f_i = \frac{LAI_i}{\sum_{j}{LAI_j}}$
+
+### Fraction of rhizosphere in each water pool
+
+We will assume that roots of each plant cohort $i$ mainly occupy its own water pool $i$, but roots may extend horizontally into the water pools corresponding to other plant cohorts. In other words, the root systems of different cohorts may overlap horizontally. Moreover, the horizontal overlap of root systems will vary across soil layers. A given plant cohort $i$ will have its fine roots in layer $s$ partitioned among different water pools. We thus need to define $p(i)_{s,j}$, the (horizontal) proportion of fine roots of cohort $i$ in layer $s$ of the water pool $j$, with the restriction that: 
+
+$\sum_{j}{p(i)_{s,j}}=1\,\forall i,s$
+
+At this point there are two extreme cases:
+
+  + *Total rhizosphere overlap*: In this case, water pools do not need to be considered. Equivalently, for any cohort $i$ the fraction of fine roots in each $j$ water pool equals its corresponding ground fractional area, i.e. $p(i)_{s,j} = f_j \, \forall s$.
+  + *No rhizosphere overlap*: For any cohort $i$, all fine roots are in its corresponding water pool, i.e. $p(i)_{s,j} = 1$ if $j = i$ and $p(i)_{s,j} = 0$ if $j \neq i$.
+  
+Between these two extreme cases we can have a *partial rhizosphere overlap*, defined as $p(i)_{s,j} \in\,(f_i,1)$ if $j = i$ and $p(i)_{s,j} \in\, (0, f_j)$ if $j \neq i$.
+
+### Dynamic partial overlap
+
+Let us define a *dynamic regulating function* $g(K) \in (0,1)$ depending on soil conductivity of a given soil layer. Then the partial rhizosphere overlap for cohort $i$ can be defined as a function of $K_{s,j}$, the soil conductivity of the $s$ layer in the $j$ water pool, i.e. $p(i)_{s,j} = g(K_{s,j}) \cdot f_j$ if $j\neq i$; and as the remaining $p(i)_{s,j} = 1 - \sum_{k \neq i} {p(i)_{s,k}}$ if $j = i$. 
+
+Let us explain in other words, how the dynamic overlap works. Under sufficient soil moisture, water circulates horizontally and the plant cohorts are assumed to share the same water pools. If soil moisture decreases in the soil of the water pool of a given plant cohort $j$, the corresponding conductivity decrease may cause the remaining cohorts to reduce their proportion of fine roots in that pool, allowing the plant cohort $j$ to control the remaining soil moisture of its water pool. If the soil moisture decreases in all water pools, this causes complete isolation of rhizospheres, so that each plant cohort controls further water extraction. As soon as the soil moisture, and hence conductivity, increases enough to allow water circulation between fine roots of different species, the functional overlap of rhizosphere increases and interaction for soil water is allowed again. 
+
+Although it is sensible to base $g$ on conductivity, we do not have explicit coordinates and it is difficult to establish a particular formulation for $g$. Therefore, we propose the following function where $K_{full}$ is the conductivity allowing a full connectivity of water pools:
+
+$g(K) = \min(1, K/K_{full})$
+
+Thus $g(K) = 1$ if $K \geq K_{full}$ and $g(K) < 1$ if $K < K_{full}$, with the decrease in overlap following linearly the decrease in conductivity. Using this definition for $g$ has the advantage of allowing the overlap of water pools to be different depending on the soil physical properties related to hydraulic conductivity. Moreover, parameter $K_{full}$ has a physical interpretation.
+
+### How water pools are implemented in the water balance model?
+When water pools are considered, the ground area of the stand is divided into as many portions as plant cohorts, and where proportions are given by $f_i$. Soil water balance components (infiltration, evaporation from the soil surface, percolation, etc.) can be evaluated independently for each water pool. At any given point, the moisture of the entire soil can be known by averaging the soil moisture of water pools, e.g. for a given layer $s$:
+$\Theta_{s} = \sum_{j}{\Theta_{j,s} \cdot f_j}$
+where $\Theta_{s}$ is the volumetric moisture of soil layer $s$ and $\Theta_{j,s}$ is the corresponding moisture in water pool $j$. 
+
+A special consideration has to be made for soil water extraction by plants. In a water balance model with the soil divided vertically into layers, we have that the fraction of fine roots of a plant cohort $i$ in a soil layer $s$ is given by $V_{i,s}$ (with the restriction that $\sum_{s}{V_{i,s}}=1$); and the amount of water extracted by cohort $i$ from each layer $s$ depends on $V_{i,s}$ and the corresponding soil water potential $\Psi_{s}$. If water pools are considered, the proportion of fine roots of cohort $i$ in layer $s$ of a given water pool $j$, will then be equal to $V_{i,j,s} = p(i)_{s,j} \cdot V_{i,s}$, so that $\sum_{j}{\sum_{s}{V_{i,j,s}}}=1$. The plant hydraulics submodel can treat proportions $V_{i,j,s}$ as different fractions of the rhizosphere, analogously to $V_{i,j}$, and the amount of water extracted by cohort $i$ from each layer depends on $V_{i,j,s}$ and the water potential in the corresponding water pool soil layer, i.e. $\Psi_{s,j}$. 
+
