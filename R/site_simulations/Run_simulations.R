@@ -41,18 +41,20 @@ sim_plot<-function(pl_code, transpirationMode, rhizosphereOverlap,
   }
 }
 
-# process all sites and combinations
-# for(site in c("fb", "pr", "pu", "cb", "es", "ro")) {
-#   for(mode in c("Granier", "Sperry", "Sureau")) {
-#     for(rhizosphereOverlap in c("total", "partial", "none")) {
-#       sim_plot(site, mode, rhizosphereOverlap, 0.01)
-#     }
-#   }
-# }
+sites <- c("fb", "pr", "pu", "cb", "es", "ro")
+modes <- "Sureau"
+# process all sites and combinations ("total" and "none")
+for(site in sites) {
+  for(mode in modes) {
+    for(rhizosphereOverlap in c("total", "none")) {
+      sim_plot(site, mode, rhizosphereOverlap, NA)
+    }
+  }
+}
 
-# process all sites and combinations
-for(site in c("fb", "pr", "pu", "cb", "es", "ro")) {
-  for(mode in c("Sureau")) {
+# process all sites and combinations ("partial")
+for(site in sites) {
+  for(mode in modes) {
     Kseq <- 10^seq(-1, -8, by = -1)
     for(K in Kseq) sim_plot(site, mode, "partial", K)
   }
